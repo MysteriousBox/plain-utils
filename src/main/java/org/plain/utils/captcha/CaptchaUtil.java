@@ -2,8 +2,6 @@ package org.plain.utils.captcha;
 
 import com.google.code.kaptcha.Producer;
 import com.google.code.kaptcha.util.Config;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.awt.image.BufferedImage;
 import java.util.Properties;
@@ -44,6 +42,10 @@ public class CaptchaUtil {
         PRODUCER = config.getProducerImpl();
     }
 
+    private CaptchaUtil() {
+        throw new AssertionError("No instances");
+    }
+
     /**
      * 生成验证码
      * @return 验证码字符串
@@ -56,11 +58,27 @@ public class CaptchaUtil {
     }
 
 
-    @Getter
-    @AllArgsConstructor
     public static class Captcha {
         private final String captchaId;
         private final String captchaText;
         private final BufferedImage captchaImage;
+
+        public Captcha(String captchaId, String captchaText, BufferedImage captchaImage) {
+            this.captchaId = captchaId;
+            this.captchaText = captchaText;
+            this.captchaImage = captchaImage;
+        }
+
+        public String getCaptchaId() {
+            return captchaId;
+        }
+
+        public String getCaptchaText() {
+            return captchaText;
+        }
+
+        public BufferedImage getCaptchaImage() {
+            return captchaImage;
+        }
     }
 }

@@ -1,0 +1,7 @@
+{
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "maven.executable.path": "/usr/share/maven/bin/mvn",
+  "maven.settingsFile": "/home/jayden/.m2/settings.xml",
+  "java.configuration.maven.userSettings": "/home/jayden/.m2/settings.xml",
+  "java.configuration.maven.globalSettings": "/home/jayden/.m2/settings.xml"
+}

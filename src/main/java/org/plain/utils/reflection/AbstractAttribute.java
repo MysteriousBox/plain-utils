@@ -1,22 +1,45 @@
 package org.plain.utils.reflection;
 
-@lombok.Getter
+/**
+ * 抽象属性定义
+ * @author Hugh
+ */
 public abstract class AbstractAttribute {
 
     private String name;
 
-    private Getter getter;
+    private AbstractGetter getter;
 
-    @lombok.Setter
-    private Setter setter;
+    private AbstractSetter setter;
 
+    public String getName() {
+        return this.name;
+    }
+
+    public AbstractGetter getGetter() {
+        return this.getter;
+    }
+
+    public AbstractSetter getSetter() {
+        return this.setter;
+    }
+
+    /**
+     * 获取声明该属性的类
+     *
+     * @return declaring class of the property
+     */
     public abstract Class<?> getDeclaringClass();
 
-    protected void setGetter(Getter getter){
+    protected void setGetter(AbstractGetter getter) {
         this.getter = getter;
     }
 
-    protected void setName(String name){
+    protected void setSetter(AbstractSetter setter) {
+        this.setter = setter;
+    }
+
+    protected void setName(String name) {
         this.name = name;
     }
 

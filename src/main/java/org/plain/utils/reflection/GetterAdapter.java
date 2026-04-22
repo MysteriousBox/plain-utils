@@ -3,11 +3,15 @@ package org.plain.utils.reflection;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class GetterAdapter extends Getter {
+/**
+ * Getter 方法适配器
+ * @author Hugh
+ */
+public class GetterAdapter extends AbstractGetter {
 
     private final Method method;
 
-    public GetterAdapter(Method method) {
+    protected GetterAdapter(Method method) {
         this.method = method;
         this.setName(method.getName().substring(GET_METHOD_PREFIX.length()));
     }
@@ -29,7 +33,7 @@ public class GetterAdapter extends Getter {
      * @param method method
      * @return 适配则返回 一个 attribute 实例，否则返回 null
      */
-    public static Getter adapterGetter(Method method){
+    public static AbstractGetter adapterGetter(Method method){
         if (method.getReturnType().equals(void.class)){
             return null;
         }
@@ -41,8 +45,8 @@ public class GetterAdapter extends Getter {
 
 
 
-    public static Boolean isStartWithGet(Method method){
-        return GET_METHOD_PREFIX.equals(method.getName().substring(0,GET_METHOD_PREFIX.length()));
+    public static boolean isStartWithGet(Method method) {
+        return GET_METHOD_PREFIX.equals(method.getName().substring(0, GET_METHOD_PREFIX.length()));
     }
 
 

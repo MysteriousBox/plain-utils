@@ -11,15 +11,33 @@ import java.util.Base64;
  * @author Hugh
  */
 public class ImageUtil {
+    private ImageUtil() {
+        /* This utility class should not be instantiated */
+    }
 
-    // BufferedImage -> byte[]
+
+    /**
+     * Convert a buffered image to a byte array.
+     *
+     * @param image  the image to convert
+     * @param format target image format
+     * @return image bytes
+     * @throws IOException when image writing fails
+     */
     public static byte[] toBytes(BufferedImage image, ImageFormat format) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, format.getFormatName(), baos);
         return baos.toByteArray();
     }
 
-    // BufferedImage -> Base64 String
+    /**
+     * Convert a buffered image to a Base64 encoded string.
+     *
+     * @param image  the image to convert
+     * @param format target image format
+     * @return Base64 string representation of the image
+     * @throws IOException when image writing fails
+     */
     public static String toBase64(BufferedImage image, ImageFormat format) throws IOException {
         byte[] bytes = toBytes(image, format);
         return Base64.getEncoder().encodeToString(bytes);

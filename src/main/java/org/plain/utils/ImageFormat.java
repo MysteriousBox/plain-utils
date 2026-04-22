@@ -34,4 +34,13 @@ public enum ImageFormat {
         this.formatName = formatName;
     }
 
+    /**
+     * 获取格式名称
+     *
+     * @return format name
+     */
+    public String getFormatName() {
+        return formatName;
+    }
+
 }

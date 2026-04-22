@@ -4,6 +4,7 @@ import java.util.Collection;
 
 /**
  * 转换器接口
+ * @author Hugh
  * @param <S> 源对象
  * @param <T> 目标对象
  */

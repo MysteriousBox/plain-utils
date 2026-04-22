@@ -3,11 +3,15 @@ package org.plain.utils.reflection;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class SetterAdapter extends Setter{
+/**
+ * Setter 方法适配器
+ * @author Hugh
+ */
+public class SetterAdapter extends AbstractSetter {
 
     private final Method method;
 
-    public SetterAdapter(Method method){
+    protected SetterAdapter(Method method) {
         this.method = method;
         this.setName(this.method.getName().substring(SET_METHOD_PREFIX.length()));
     }
@@ -28,7 +32,7 @@ public class SetterAdapter extends Setter{
      * @param method method
      * @return 适配则返回 一个 Setter 实例，否则返回 null
      */
-    public static Setter adapterSetter(Method method){
+    public static AbstractSetter adapterSetter(Method method){
         if (!method.getReturnType().equals(void.class)){
             return null;
         }
@@ -40,8 +44,8 @@ public class SetterAdapter extends Setter{
 
 
 
-    public static Boolean isStartWithSet(Method method){
-        return SET_METHOD_PREFIX.equals(method.getName().substring(0,SET_METHOD_PREFIX.length()));
+    public static boolean isStartWithSet(Method method) {
+        return SET_METHOD_PREFIX.equals(method.getName().substring(0, SET_METHOD_PREFIX.length()));
     }
 
 }

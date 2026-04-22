@@ -5,22 +5,35 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.plain.utils.reflection.Getter;
+import org.plain.utils.reflection.AbstractGetter;
 import org.plain.utils.reflection.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * JSON 序列化 / 反序列化工具类
+ * @author Hugh
+ */
 public class JsonUtil {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    private JsonUtil() {
+        throw new AssertionError("No instances");
+    }
 
     public static String serialize(Object object){
 
         try {
             return OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonUtilException(e);
         }
     }
 
@@ -39,7 +52,7 @@ public class JsonUtil {
             throw new  IllegalArgumentException("the object argument can be not map type!");
         }
         if (includeAttributes.length ==0){
-            throw new IllegalArgumentException("the length of the excludeAttributes array can not be 0!");
+            throw new IllegalArgumentException("the length of the includeAttributes array can not be 0!");
         }
         return serialize(mapAttribute(object, includeAttributes,false));
     }
@@ -49,7 +62,7 @@ public class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(jsonStr,clazz);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonUtilException(e);
         }
     }
 
@@ -58,31 +71,41 @@ public class JsonUtil {
         try {
            return OBJECT_MAPPER.readValue(jsonStr,typeReference);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonUtilException(e);
         }
     }
 
 
-    public static <T> TypeReference<T> createTypeReference(T type){
+    public static <T> TypeReference<T> createTypeReference(){
         return new TypeReference<T>() {
         };
     }
 
-    private static Map<String, Object> mapAttribute(Object object, String[] attributes, Boolean excludeOrInclude) {
-        Map<String,Object> container = new HashMap<>();
+    public static class JsonUtilException extends RuntimeException {
+        public JsonUtilException(Throwable cause) {
+            super(cause);
+        }
+
+        public JsonUtilException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    private static Map<String, Object> mapAttribute(Object object, String[] attributes, boolean excludeOrInclude) {
+        Set<String> attributeSet = new HashSet<>(Arrays.asList(attributes));
+        Map<String,Object> container = new HashMap<>(Math.max(attributeSet.size(), 1));
         Class<?> aClass = object.getClass();
-        List<Getter> declaredFields = ReflectionUtil.getAllGetterAttributes(aClass);
-        for (Getter getter : declaredFields) {
+        List<AbstractGetter> declaredFields = ReflectionUtil.getAllGetterAttributes(aClass);
+        for (AbstractGetter getter : declaredFields) {
             String nameForStartWithLowerCase = getter.getNameForStartWithLowerCase();
-            if (excludeOrInclude&&Arrays.asList(attributes).contains(nameForStartWithLowerCase)){
-                continue;
-            } else if (!excludeOrInclude&&Arrays.stream(attributes).noneMatch(item->item.equals(nameForStartWithLowerCase))) {
+            boolean contains = attributeSet.contains(nameForStartWithLowerCase);
+            if (excludeOrInclude ? contains : !contains) {
                 continue;
             }
             try {
                 container.put(nameForStartWithLowerCase, getter.invoke(object));
             } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
+                throw new JsonUtilException(e);
             }
         }
         return container;
@@ -119,7 +142,7 @@ public class JsonUtil {
 
         private String[] attributes = new String[]{};
 
-        private Boolean excludeOrInclude;
+        private boolean excludeOrInclude;
 
 
         private SerializeBuilder(Object object){
@@ -141,7 +164,7 @@ public class JsonUtil {
             return this;
         }
 
-        public SerializeBuilder registerModules(Iterable<? extends Module> modules){
+        public SerializeBuilder registerModules(Iterable<Module> modules){
             OBJECT_MAPPER.registerModules(modules);
             return this;
         }
@@ -172,7 +195,7 @@ public class JsonUtil {
                 }
                 return OBJECT_MAPPER.writeValueAsString(serializeObject);
             } catch (JsonProcessingException e) {
-                throw new RuntimeException(e.getMessage(),e);
+                throw new JsonUtilException(e.getMessage(),e);
             }
         }
 
@@ -188,7 +211,7 @@ public class JsonUtil {
                 }
                 return OBJECT_MAPPER.writeValueAsString(object);
             } catch (JsonProcessingException e) {
-                throw new RuntimeException(e.getMessage(),e);
+                throw new JsonUtilException(e.getMessage(),e);
             }
         }
     }
@@ -228,7 +251,7 @@ public class JsonUtil {
             return this;
         }
 
-        public DeserializeBuilder registerModules(Iterable<? extends Module> modules){
+        public DeserializeBuilder registerModules(Iterable<Module> modules){
             OBJECT_MAPPER.registerModules(modules);
             return this;
         }
@@ -242,7 +265,7 @@ public class JsonUtil {
             try {
                 return OBJECT_MAPPER.readValue(jsonStr,clazz);
             } catch (JsonProcessingException e) {
-                throw new RuntimeException(e.getMessage(),e);
+                throw new JsonUtilException(e.getMessage(),e);
             }
         }
 
@@ -254,7 +277,7 @@ public class JsonUtil {
             try {
                 return OBJECT_MAPPER.readValue(jsonStr,typeReference);
             } catch (JsonProcessingException e) {
-                throw new RuntimeException(e.getMessage(),e);
+                throw new JsonUtilException(e.getMessage(),e);
             }
         }
     }

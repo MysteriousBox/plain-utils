@@ -2,7 +2,10 @@ package org.plain.utils.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -11,6 +14,9 @@ import java.util.stream.Collectors;
  */
 public class ReflectionUtil {
 
+    private ReflectionUtil() {
+        throw new AssertionError("No instances");
+    }
 
     /**
      * 递归获取所有字段（包括父类的字段）
@@ -30,30 +36,8 @@ public class ReflectionUtil {
         return fields;
     }
 
-    public static List<Getter> getAllGetterAttributes(Class<?> aClass){
+    public static List<AbstractGetter> getAllGetterAttributes(Class<?> aClass){
         ClassExtender<?> classExtender = ClassExtender.create(aClass);
-
-//        Method[] declaredMethods = aClass.getDeclaredMethods();
-//        List<Getter> getters = new ArrayList<>();
-//        for (Method declaredMethod : declaredMethods) {
-//            // 判断 方法的修饰符 是否是 public，如果不是则下一个
-//            if (!Modifier.isPublic(declaredMethod.getModifiers())){
-//                continue;
-//            }
-//            Getter getter = GetterAdapter.adapterGetter(declaredMethod);
-//            if (getter == null){
-//                continue;
-//            }
-//            getters.add(getter);
-//        }
-//        // 递归获取父类的方法
-//        Class<?> superclass = aClass.getSuperclass();
-//        if (superclass!=null){
-//            if (!superclass.getName().equals("java.lang.Object")){
-//                getters.addAll(getAllGetterAttributes(superclass));
-//            }
-//        }
-
         return classExtender.getAttributes().stream().map(AbstractAttribute::getGetter).collect(Collectors.toList());
     }
 
@@ -66,11 +50,10 @@ public class ReflectionUtil {
         Method[] declaredMethods = clazz.getDeclaredMethods();
         List<Method> result = new ArrayList<>(Arrays.asList(declaredMethods));
         Class<?> superclass = clazz.getSuperclass();
-        if (superclass!=null){
-            if (!superclass.getName().equals("java.lang.Object")){
+        if (superclass!=null && superclass != Object.class){
                  result.addAll(getAllDeclaredMethods(superclass));
             }
-        }
+        
         return result;
     }
 
@@ -105,6 +88,7 @@ public class ReflectionUtil {
         try {
             return clazz.getDeclaredMethod(methodName, parameterTypes);
         } catch (NoSuchMethodException ignored) {
+            // 找不到方法时返回 null
         }
         return null;
     }

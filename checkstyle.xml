@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+  "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+  "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+
+  <property name="charset" value="UTF-8"/>
+
+  <module name="TreeWalker">
+
+    <!-- ===================== -->
+    <!-- 1. 命名规范（严格） -->
+    <!-- ===================== -->
+
+    <module name="LocalVariableName">
+      <property name="format" value="^[a-z][a-zA-Z0-9]{1,30}$"/>
+    </module>
+
+    <module name="MemberName">
+      <property name="format" value="^[a-z][a-zA-Z0-9]{1,30}$"/>
+    </module>
+
+    <module name="MethodName">
+      <property name="format" value="^[a-z][a-zA-Z0-9]{1,40}$"/>
+    </module>
+
+    <!-- ===================== -->
+    <!-- 2. 方法 / 类复杂度（偏严格） -->
+    <!-- ===================== -->
+
+    <module name="MethodLength">
+      <property name="max" value="60"/>
+    </module>
+
+    <module name="ClassDataAbstractionCoupling">
+      <property name="max" value="10"/>
+    </module>
+
+    <module name="CyclomaticComplexity">
+      <property name="max" value="8"/>
+    </module>
+
+    <!-- ===================== -->
+    <!-- 3. 参数控制（DDD很重要） -->
+    <!-- ===================== -->
+
+    <module name="ParameterNumber">
+      <property name="max" value="5"/>
+    </module>
+
+    <!-- ===================== -->
+    <!-- 4. 禁止魔法值（严格） -->
+    <!-- ===================== -->
+
+    <module name="MagicNumber">
+      <property name="ignoreNumbers" value="-1,0,1"/>
+    </module>
+
+    <!-- ===================== -->
+    <!-- 5. 空值 / 代码质量 -->
+    <!-- ===================== -->
+
+    <module name="EmptyBlock"/>
+    <module name="EmptyCatchBlock"/>
+
+    <!-- ===================== -->
+    <!-- 7. import 规范 -->
+    <!-- ===================== -->
+
+    <module name="AvoidStarImport"/>
+
+  </module>
+
+  <!-- ===================== -->
+  <!-- 6. 日志规范（非常推荐） -->
+  <!-- ===================== -->
+
+  <module name="RegexpSingleline">
+    <property name="format" value="System\.out\.println"/>
+    <property name="message" value="禁止使用 System.out"/>
+  </module>
+
+  <module name="RegexpSingleline">
+    <property name="format" value="printStackTrace"/>
+    <property name="message" value="禁止直接打印异常堆栈"/>
+  </module>
+
+</module>

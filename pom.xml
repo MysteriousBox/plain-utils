@@ -2,6 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+           <?m2e execute onConfiguration,onIncremental?>
+           <?m2e execute onConfiguration?>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.plain.utils</groupId>
@@ -15,7 +17,7 @@
         <logback-classic.version>1.4.12</logback-classic.version>
         <jackjson.version>2.13.4.2</jackjson.version>
         <lombok.version>1.18.30</lombok.version>
-        <testng.version>7.7.0</testng.version>
+        <testng.version>6.14.3</testng.version>
         <nimbus-jose-jwt.version>10.0.2</nimbus-jose-jwt.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <kaptcha.version>2.3.2</kaptcha.version>
@@ -61,6 +63,40 @@
             <artifactId>kaptcha</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.2.2</version>
+                <executions>
+                    <execution>
+                      <?m2e execute onConfiguration?>
+                        <id>validate-checkstyle</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configLocation>checkstyle.xml</configLocation>
+                    <encoding>UTF-8</encoding>
+                    <failsOnError>true</failsOnError>
+                    <violationSeverity>error</violationSeverity>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <dependencyManagement>
         <dependencies>
             <dependency>

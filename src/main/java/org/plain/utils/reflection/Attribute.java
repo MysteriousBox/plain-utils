@@ -1,5 +1,9 @@
 package org.plain.utils.reflection;
 
+/**
+ * 属性对象
+ * @author Hugh
+ */
 public class Attribute extends AbstractAttribute{
 
     public Attribute(String name){

@@ -16,10 +16,12 @@ import java.util.Map;
  * @author Hugh
  */
 public class JwtUtil {
+    private JwtUtil() {
+        /* This utility class should not be instantiated */
+    }
+
 
     public static Map<String,Object> getClaims(){
-
-
-        return new HashMap<>();
+        return new HashMap<>(0);
     }
 }

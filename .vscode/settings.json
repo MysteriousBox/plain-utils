@@ -1,5 +1,9 @@
 {
-  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.jdt.ls.vmargs": "-Xmx2G -XX:+UseG1GC -XX:+UseStringDeduplication -Dfile.encoding=UTF-8",
+  "java.autobuild.enabled": false,
+  "java.trace.server": "off",
+  "java.errors.incompleteClasspath.severity": "ignore",
   "maven.executable.path": "/usr/share/maven/bin/mvn",
   "maven.settingsFile": "/home/jayden/.m2/settings.xml",
   "java.configuration.maven.userSettings": "/home/jayden/.m2/settings.xml",

@@ -136,13 +136,22 @@ public class JsonUtil {
     }
 
     public static final class SerializeBuilder{
-        private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+        /**
+         * 只读模板。builder 的配置类方法（registerModule/s 等）会先 {@code copy()} 出实例私有副本，
+         * 不再改写这份静态 mapper —— 否则一个调用方的模块注册会永久影响同 JVM 内所有后来的
+         * builder（例如注册 OAuth2AuthorizationServerJackson2Module 会顺带打开 default typing，
+         * 于是别的调用方读普通 Map 时开始报 missing type id '@class'）。
+         * 未调用配置方法时直接复用模板，热路径不产生额外分配。
+         */
+        private static final ObjectMapper TEMPLATE_MAPPER = new ObjectMapper();
 
         private  Object serializeObject;
 
         private String[] attributes = new String[]{};
 
         private boolean excludeOrInclude;
+
+        private ObjectMapper objectMapper;
 
 
         private SerializeBuilder(Object object){
@@ -153,19 +162,30 @@ public class JsonUtil {
 
         }
 
+        private ObjectMapper writableObjectMapper(){
+            if (this.objectMapper == null){
+                this.objectMapper = TEMPLATE_MAPPER.copy();
+            }
+            return this.objectMapper;
+        }
+
+        private ObjectMapper readableObjectMapper(){
+            return this.objectMapper != null ? this.objectMapper : TEMPLATE_MAPPER;
+        }
+
         public SerializeBuilder registerModule(Module module){
-            OBJECT_MAPPER.registerModule(module);
+            writableObjectMapper().registerModule(module);
             return this;
         }
 
 
         public SerializeBuilder registerModules(Module... modules){
-            OBJECT_MAPPER.registerModules(modules);
+            writableObjectMapper().registerModules(modules);
             return this;
         }
 
         public SerializeBuilder registerModules(Iterable<Module> modules){
-            OBJECT_MAPPER.registerModules(modules);
+            writableObjectMapper().registerModules(modules);
             return this;
         }
 
@@ -191,9 +211,9 @@ public class JsonUtil {
         public String serialize(){
             try {
                 if (this.attributes.length >0){
-                    return OBJECT_MAPPER.writeValueAsString(mapAttribute(this.serializeObject, this.attributes, this.excludeOrInclude));
+                    return readableObjectMapper().writeValueAsString(mapAttribute(this.serializeObject, this.attributes, this.excludeOrInclude));
                 }
-                return OBJECT_MAPPER.writeValueAsString(serializeObject);
+                return readableObjectMapper().writeValueAsString(serializeObject);
             } catch (JsonProcessingException e) {
                 throw new JsonUtilException(e.getMessage(),e);
             }
@@ -207,9 +227,9 @@ public class JsonUtil {
         public String serialize(Object object){
             try {
                 if (this.attributes.length >0){
-                    return OBJECT_MAPPER.writeValueAsString(mapAttribute(object, this.attributes, this.excludeOrInclude));
+                    return readableObjectMapper().writeValueAsString(mapAttribute(object, this.attributes, this.excludeOrInclude));
                 }
-                return OBJECT_MAPPER.writeValueAsString(object);
+                return readableObjectMapper().writeValueAsString(object);
             } catch (JsonProcessingException e) {
                 throw new JsonUtilException(e.getMessage(),e);
             }
@@ -218,10 +238,15 @@ public class JsonUtil {
 
 
     public static final class DeserializeBuilder{
-        private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+        /**
+         * 只读模板，配置方法只影响本 builder 的私有副本；理由见 {@code SerializeBuilder.TEMPLATE_MAPPER}。
+         */
+        private static final ObjectMapper TEMPLATE_MAPPER = new ObjectMapper();
 
 
         private  String jsonObject;
+
+        private ObjectMapper objectMapper;
 
 
         public DeserializeBuilder(String jsonObject){
@@ -232,14 +257,27 @@ public class JsonUtil {
 
         }
 
+        private ObjectMapper writableObjectMapper(){
+            if (this.objectMapper == null){
+                this.objectMapper = TEMPLATE_MAPPER.copy();
+            }
+            return this.objectMapper;
+        }
+
+        private ObjectMapper readableObjectMapper(){
+            return this.objectMapper != null ? this.objectMapper : TEMPLATE_MAPPER;
+        }
+
         public DeserializeBuilder registerModule(Module module){
-            OBJECT_MAPPER.registerModule(module);
+            writableObjectMapper().registerModule(module);
             return this;
         }
 
         public DeserializeBuilder enableDefaultTyping(){
-            OBJECT_MAPPER.activateDefaultTyping(
-                    OBJECT_MAPPER.getPolymorphicTypeValidator(), // 使用安全的类型校验器
+            ObjectMapper mapper = writableObjectMapper();
+            // 注意：默认 mapper 的校验器是放行的，这里等于沿用其现有强度，未做收紧
+            mapper.activateDefaultTyping(
+                    mapper.getPolymorphicTypeValidator(),
                     ObjectMapper.DefaultTyping.NON_FINAL, // 默认对非 final 类型启用类型信息
                     JsonTypeInfo.As.PROPERTY // 类型信息的注入方式
             );
@@ -247,12 +285,12 @@ public class JsonUtil {
         }
 
         public DeserializeBuilder registerModules(Module... modules){
-            OBJECT_MAPPER.registerModules(modules);
+            writableObjectMapper().registerModules(modules);
             return this;
         }
 
         public DeserializeBuilder registerModules(Iterable<Module> modules){
-            OBJECT_MAPPER.registerModules(modules);
+            writableObjectMapper().registerModules(modules);
             return this;
         }
 
@@ -263,7 +301,7 @@ public class JsonUtil {
 
         public <T> T deserialize(String jsonStr,Class<T> clazz){
             try {
-                return OBJECT_MAPPER.readValue(jsonStr,clazz);
+                return readableObjectMapper().readValue(jsonStr,clazz);
             } catch (JsonProcessingException e) {
                 throw new JsonUtilException(e.getMessage(),e);
             }
@@ -275,7 +313,7 @@ public class JsonUtil {
 
         public <T> T deserialize(String jsonStr, TypeReference<T> typeReference){
             try {
-                return OBJECT_MAPPER.readValue(jsonStr,typeReference);
+                return readableObjectMapper().readValue(jsonStr,typeReference);
             } catch (JsonProcessingException e) {
                 throw new JsonUtilException(e.getMessage(),e);
             }

@@ -18,7 +18,6 @@
         <jackjson.version>2.13.4.2</jackjson.version>
         <lombok.version>1.18.30</lombok.version>
         <testng.version>7.5.1</testng.version>
-        <nimbus-jose-jwt.version>10.0.2</nimbus-jose-jwt.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <kaptcha.version>2.3.2</kaptcha.version>
     </properties>
@@ -48,10 +47,6 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.nimbusds</groupId>
-            <artifactId>nimbus-jose-jwt</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -120,11 +115,6 @@
                 <artifactId>testng</artifactId>
                 <version>${testng.version}</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.nimbusds</groupId>
-                <artifactId>nimbus-jose-jwt</artifactId>
-                <version>${nimbus-jose-jwt.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mapstruct</groupId>

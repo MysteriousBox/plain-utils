@@ -27,8 +27,12 @@ public class CaptchaUtil {
     private static final String IMAGE_HEIGHT = "60";
     private static final String NOISE_IMPL_KEY = "kaptcha.noise.impl";
     private static final String NOISE_IMPL = "com.google.code.kaptcha.impl.DefaultNoise";
-
-
+    private static final String NOISE_COLOR_KEY = "kaptcha.noise.color";
+    private static final String NOISE_COLOR = "190,190,190";
+    private static final String FONT_SIZE_KEY = "kaptcha.textproducer.font.size";
+    private static final String FONT_SIZE = "26";
+    private static final String CHAR_SPACE_KEY = "kaptcha.textproducer.char.space";
+    private static final String CHAR_SPACE = "2";
 
     static {
         // 静态初始化验证码配置
@@ -38,6 +42,10 @@ public class CaptchaUtil {
         props.setProperty(IMAGE_WIDTH_KEY, IMAGE_WIDTH);
         props.setProperty(IMAGE_HEIGHT_KEY, IMAGE_HEIGHT);
         props.setProperty(NOISE_IMPL_KEY, NOISE_IMPL);
+        // 浅灰干扰线避免与黑色字符混淆，缩小字号给宽字符留出边距。
+        props.setProperty(NOISE_COLOR_KEY, NOISE_COLOR);
+        props.setProperty(FONT_SIZE_KEY, FONT_SIZE);
+        props.setProperty(CHAR_SPACE_KEY, CHAR_SPACE);
         Config config = new Config(props);
         PRODUCER = config.getProducerImpl();
     }
